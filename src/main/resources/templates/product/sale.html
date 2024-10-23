@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+</head>
+<body>
+    <div th:replace="common/header"></div>
+
+    <h2 align="center">제품 구매 페이지입니다. 원하시는 물품을 선택해주세요!</h2>
+
+    <table align="center" border="1">
+        <tr>
+            <th>상품번호</th>
+            <th>상품이름</th>
+            <th>재고</th>
+            <th>가격</th>
+        </tr>
+        <tr th:each="product : ${productList}">
+            <th th:text="${product.productCode}"></th>
+            <th th:text="${product.productName}"></th>
+            <th th:text="|${product.productCount}개|"></th>
+            <th th:text="|${product.productPrice}원|"></th>
+        </tr>
+    </table>
+
+</body>
+</html>

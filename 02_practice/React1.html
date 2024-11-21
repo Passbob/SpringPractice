@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <style>
+        .helloText{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1 style="text-align: center;">이 문서는 리액트 들어가기 전에 혼자 해보려고 만들었다.</h1>
+
+    <br>
+    <hr>
+    <div id="hello"></div>
+
+
+    <script>
+        const hello = React.createElement('h1', {className:'helloText', id:'helloText'}, '반갑다 ㅋㅋ');
+        const hello2 = React.createElement('h1', {className:'helloText', id:'helloText2'}, '어서와라 임마 ㅋㅋ');
+
+        // ReactDOM.render(hello,  document.getElementById('hello'))
+        ReactDOM.createRoot(document.getElementById('hello')).render([hello, hello2]);
+    </script>
+</body>
+</html>

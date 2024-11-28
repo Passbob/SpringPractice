@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const API_KEY= '8686d7a9f9135c786b57da7f8f6e7c47';
+
+        const {useEffect, useState, useMemo} = React;
+
+        
+
+        // 날씨에 대한 정보 불러오기
+        function Weather({weather, setWeather}){
+            
+            // 경도, 위도
+            const [position, setPosition] = useState({});
+            // 도시이름
+            const [city, setCity] = useState('');
+            // 바람
+            const [wind, setWind] = useState({});
+            
+
+            useEffect( 
+                ()=>{
+                    // fetch에서 오류를 피하기 위해 promise 사용해 coords를 담아갈 수 있도록
+                    new Promise((resolve, reject)=>{
+                        // 현재의 위치를 파악하기 위해 경도와 위도 찾기
+                        navigator.geolocation.getCurrentPosition(currentPosition =>{
+                            setPosition({
+                                latitude : currentPosition.latitude,
+                                longitude : currentPosition.longitude
+                            })
+
+                            resolve(currentPosition.coords)
+                        })
+                    }).then(coords=>{
+                            // fetch에 날씨 API를 불러올 수 있도록 위 resolve에 넣어둔 coords를 꺼내온다.
+                            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${API_KEY}`)
+                            .then(res=>res.json())
+                            .then(data => {
+                            console.log(data)
+                                setCity(data.name);
+                                setWeather(data.weather[0]);
+                                setWind(data.wind);
+                            })
+                        })
+                },[]
+            )
+
+            return(
+                <>
+                    <h3>도시</h3>
+                    <h4>{city}</h4>
+                    <h3>날씨</h3>
+                    <h4>{`${weather.main} -> ${weather.description}`}</h4>
+                    <h3>바람</h3>
+                    <h4>{`${wind.deg}도 , ${wind.speed}m/s`}</h4>
+                </>
+            )
+
+        }
+
+        // 날씨에 해당하는 이모지 불러오기
+        function GitEmoji({weather}){
+            // git 이모지 불러오는 url
+            const [imgUrl, setImgUrl] = useState('')
+
+            // 무한 렌더링이 발생했었다. 그 이유는 function에 if를 넣지 않고 밖에다 적었기 때문에 그런 것 같다. 다음에는 함수에 꼭 넣자.
+            function emojiCheck(weather){
+                        if(weather==='Mist'){
+                            return 'cloud_with_rain'
+                        }else if(weather==='Rain'){
+                            return 'open_umbrella'
+                        }else if(weather==='Clouds'){
+                            return 'cloud'
+                        }
+            }
+
+            // []에 아무것도 적지 않았을 때 적용되지 않았다. useEffect가 초기에 동작하고 weather이 설정 된 후에 다시 반환하기 위해서 []에 weather을 넣었다.
+            // 하지만 렌더링이 2번 이루어진다.
+            useMemo(()=>{
+                fetch('https://api.github.com/emojis')
+                    .then(res => res.json())
+                    .then((result) => {
+                        console.log('hi')
+                        setImgUrl(result[emojiCheck(weather.main)]);
+                        })
+                },[weather]
+            )
+
+            return(
+               <img src={imgUrl}/>
+            )
+        }
+
+        // 컴포넌트들을 모아 화면에 보내는 App
+        function App(){
+            // 날씨
+            const [weather, setWeather] = useState({});
+            return(
+                <>
+                <h1>현재 기상예보입니다!</h1>
+                <Weather weather={weather} setWeather={setWeather}/>
+                <GitEmoji weather={weather}/>
+                </>
+            )
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App/>)
+    </script>
+</body>
+</html>
